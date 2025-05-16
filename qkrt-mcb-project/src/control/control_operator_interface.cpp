@@ -52,6 +52,8 @@ struct ControlState {
     bool beyblade = false;
     float wheelL = 0.0;
     float wheelR = 0.0;
+    float finialL = 0.0;
+    float finialR = 0.0;
 };
 
 static ControlState control_s;
@@ -96,26 +98,24 @@ void ControlOperatorInterface::pollInputDevices() {
             control_s.pitch = remote.getChannel(Remote::Channel::RIGHT_VERTICAL);
             control_s.yaw   = remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL);
             //control_s.flywheel = remote.getSwitch(Remote::Switch::LEFT_SWITCH) == Remote::SwitchState::UP;
-           // control_s.flywheel = (remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::MID || remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::UP);
-           // control_s.agitator = (remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::UP );
-           // wheelInput = remote.getWheel();
-           // control_s.beyblade =
+            // control_s.flywheel = (remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::MID || remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::UP);
+            // control_s.agitator = (remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::UP );
+            // wheelInput = remote.getWheel();
+            // control_s.beyblade =
             //    wheelInput >  WHEEL_DEADZONE ? true  :
             //    wheelInput < -WHEEL_DEADZONE ? false :
             //    control_s.beyblade;
             break;
         case DeviceType::KEYBOARDMOUSE:
-            rawX = 0;
-            rawY = 0;
-            control_s.pitch = 0;
-            control_s.yaw   = 0;
+            rawX = rawY = 0.0;
+            control_s.pitch = control_s.yaw = 0.0;
             //control_s.flywheel = remote.getSwitch(Remote::Switch::LEFT_SWITCH) == Remote::SwitchState::UP;
             //control_s.flywheel = (remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::MID || remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::UP);
             //control_s.agitator = (remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::UP );
             //wheelInput = remote.getWheel();
             //control_s.beyblade =
             //    wheelInput >  WHEEL_DEADZONE ? true  :
-           //     wheelInput < -WHEEL_DEADZONE ? false :
+            //     wheelInput < -WHEEL_DEADZONE ? false :
             //    control_s.beyblade;
             break;
         default:
@@ -129,7 +129,8 @@ void ControlOperatorInterface::pollInputDevices() {
     control_s.y = control_s.pitch;//std::sin(-internal::turretYaw) * rawX + std::cos(-internal::turretYaw) * rawY;
     control_s.w = 0;//control_s.beyblade ? 0.4f : 0.0f;
     control_s.normFactor = std::max(std::abs(control_s.x) + std::abs(control_s.y) + std::abs(control_s.w), 1.0f);
-
+    control_s.finialL = ((((((((control_s.x - 0.5) * 2.0) + ((control_s.y - 0.5) * 2.0 + 1)) / 2.0) + 0.5) / 2.0) + 0.5) * 0.05) + 0.05;
+    control_s.finialR = ((((((((control_s.x - 0.5) * 2.0) - ((control_s.y - 0.5) * 2.0 + 1)) / 2.0) + 0.5) / 2.0) + 0.5) * 0.05) + 0.05;
     control_s.x = (control_s.x - 0.5) * 2.0;
     control_s.y = (control_s.y - 0.5) * 2.0 + 1;
     
